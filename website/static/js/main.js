@@ -19,5 +19,16 @@ $( document ).ready(function (){
     createjs.Ticker.addEventListener('tick', stage);
     createjs.Ticker.setFPS(30);
 
-    bman.startPlaying();
+//    bman.startPlaying();
+    bman.downAnimation({
+        'x': 0,
+        'y': 100
+    }, function () {
+        bman.rightAnimation({
+            'x': 100,
+            'y': 100
+        }, function () {
+            console.log('done');
+        })
+    })
 });

@@ -25,27 +25,43 @@ var Player = function (config) {
 
 Player.prototype.startPlaying = function () {
     var self = this;
-    createjs.Tween.get(this.sprite)
-        .call(this.downAnimation)
-        .to({x:0, y:50}, 2000)
-        .call(function () {
-            createjs.Tween.get(self.sprite)
-                .call(self.rightAnimation)
-                .to({x:100, y:50}, 2000)
-                .call(self.stopAnimation);
-        });
+//            createjs.Tween.get(self.sprite)
+//                .call(self.rightAnimation)
+//                .to({x:100, y:50}, 2000)
+//                .call(self.stopAnimation);
 };
 
 Player.prototype.stopAnimation = function () {
-    this.gotoAndStop('stand');
+    this.sprite.gotoAndStop('stand');
 };
 
-Player.prototype.downAnimation = function () {
-    this.gotoAndPlay('down');
+Player.prototype.moveTo = function (position, callback) {
+    var self = this;
+
+    createjs.Tween.get(this.sprite)
+        .to({x: position.x, y: position.y}, 2000)
+        .call(end);
+
+    function end() {
+        self.stopAnimation();
+        callback();
+    }
 };
 
-Player.prototype.rightAnimation = function () {
-    this.gotoAndPlay('right');
+Player.prototype.downAnimation = function (position, callback)  {
+    this.sprite.gotoAndPlay('down');
+
+    this.moveTo(position, function () {
+        callback();
+    });
+};
+
+Player.prototype.rightAnimation = function (position, callback) {
+    this.sprite.gotoAndPlay('right');
+
+    this.moveTo(position, function () {
+        callback();
+    });
 };
 
 // export the module
