@@ -2,6 +2,8 @@
  * Created by harveydf on 20/08/14.
  */
 
+var Bomb = require('./bomb');
+
 // Define the Player
 var Player = function (config) {
     imgPlayer = new Image();
@@ -12,56 +14,55 @@ var Player = function (config) {
         images: [imgPlayer],
         frames: {width: frames.width, height: frames.height},
         animations: {
-            down: [0, 3, 'down', 0.2],
-            up: [4, 7, 'up', 0.2],
-            left: [8, 11, 'left', 0.2],
-            right: [12, 15, 'right', 0.2],
-            stand: [0]
+            up: [0, 2, 'up', 0.2],
+            left: [3, 5, 'left', 0.2],
+            down: [6, 8, 'down', 0.2],
+            right: [9, 11, 'right', 0.2],
+            stand: [7]
         }
     });
 
     this.sprite = new createjs.Sprite(spriteSheet, 'stand');
-};
-
-Player.prototype.startPlaying = function () {
-    var self = this;
-//            createjs.Tween.get(self.sprite)
-//                .call(self.rightAnimation)
-//                .to({x:100, y:50}, 2000)
-//                .call(self.stopAnimation);
+    this.sprite.x = 0;
+    this.sprite.y = 0;
+    this.sprite.width = frames.width;
+    this.sprite.height = frames.height;
 };
 
 Player.prototype.stopAnimation = function () {
-    this.sprite.gotoAndStop('stand');
+    this.gotoAndStop();
 };
 
-Player.prototype.moveTo = function (position, callback) {
-    var self = this;
-
-    createjs.Tween.get(this.sprite)
-        .to({x: position.x, y: position.y}, 2000)
-        .call(end);
-
-    function end() {
-        self.stopAnimation();
-        callback();
-    }
+Player.prototype.downAnimation = function ()  {
+    this.gotoAndPlay('down');
 };
 
-Player.prototype.downAnimation = function (position, callback)  {
-    this.sprite.gotoAndPlay('down');
-
-    this.moveTo(position, function () {
-        callback();
-    });
+Player.prototype.upAnimation = function () {
+    this.gotoAndPlay('up');
 };
 
-Player.prototype.rightAnimation = function (position, callback) {
-    this.sprite.gotoAndPlay('right');
+Player.prototype.rightAnimation = function () {
+    this.gotoAndPlay('right');
+};
 
-    this.moveTo(position, function () {
-        callback();
-    });
+Player.prototype.setBomb = function (size, directions) {
+    var bomb = new Bomb();
+
+    bomb.sprite.x = this.x;
+    bomb.sprite.y = (this.y + this.height) - bomb.sprite.height;
+
+    stage.addChild(bomb.sprite);
+    stage.setChildIndex(bomb.sprite, 0);
+
+    createjs.Tween.get(bomb.sprite)
+        .call(bomb.loadAnimation)
+        .wait(2500)
+        .call(bomb.removeBomb)
+        .call(bomb.explodeBomb, [
+            {x: bomb.sprite.x, y: bomb.sprite.y},
+            size,
+            directions
+        ]);
 };
 
 // export the module
